@@ -1,4 +1,4 @@
-import { body } from "@pnp/queryable";
+import { body, headers } from "@pnp/queryable";
 import {
     _SPCollection,
     _SPInstance,
@@ -8,6 +8,7 @@ import {
 } from "../spqueryable.js";
 import { defaultPath } from "../decorators.js";
 import { spPost, spPostMerge } from "../operations.js";
+import { metadata } from "../utils/metadata.js";
 
 @defaultPath("fields")
 export class _Fields extends _SPCollection<IFieldInfo[]> {
@@ -64,19 +65,19 @@ export class _Fields extends _SPCollection<IFieldInfo[]> {
      * @param title The new field's title
      * @param properties Differ by type of field being created (see: https://msdn.microsoft.com/en-us/library/office/dn600182.aspx)
      */
-    public async add(title: string, fieldTypeKind: number, properties?: IFieldCreationProperties): Promise<IFieldAddResult> {
-
-        const createData = await spPost<{ Id: string }>(Fields(this, null), body({
+    public async add(title: string, fieldType: string, fieldTypeKind: number, properties?: IFieldCreationProperties): Promise<IFieldAddResult> {
+        const createData = await spPost<{Id: string }>(Fields(this,null), body(Object.assign(metadata(fieldType),{
             Title: title,
             FieldTypeKind: fieldTypeKind,
             Required: properties?.Required || false,
-        }));
+            ...properties,
+        }), headers({
+            "Accept":"application/json;odata=verbose",
+            "Content-Type":"application/json;odata=verbose",
+        })));
 
+        //Questions - We need verbose headers to pass over metadata. We need matadata to do it in one request to support batching. What's the best way to handle this?
         const field = this.getById(createData.Id);
-
-        if (typeof properties !== "undefined") {
-            await field.update(properties);
-        }
 
         const data = await field();
 
@@ -116,7 +117,7 @@ export class _Fields extends _SPCollection<IFieldInfo[]> {
      */
     public addText(title: string, properties?: IFieldCreationProperties & AddTextProps): Promise<IFieldAddResult> {
 
-        return this.add(title, 2, {
+        return this.add(title, "SP.FieldText", 2, {
             MaxLength: 255,
             ...properties,
         });
@@ -130,7 +131,7 @@ export class _Fields extends _SPCollection<IFieldInfo[]> {
      */
     public addCalculated(title: string, properties?: IFieldCreationProperties & AddCalculatedProps): Promise<IFieldAddResult> {
 
-        return this.add(title, 17, {
+        return this.add(title, "SP.FieldCalculated", 17, {
             OutputType: FieldTypes.Text,
             ...properties,
         });
@@ -144,7 +145,7 @@ export class _Fields extends _SPCollection<IFieldInfo[]> {
      */
     public addDateTime(title: string, properties?: IFieldCreationProperties & AddDateTimeProps): Promise<IFieldAddResult> {
 
-        return this.add(title, 4, {
+        return this.add(title, "SP.FieldDateTime", 4, {
             DateTimeCalendarType: CalendarType.Gregorian,
             DisplayFormat: DateTimeFieldFormatType.DateOnly,
             FriendlyDisplayFormat: DateTimeFieldFriendlyFormatType.Unspecified,
@@ -160,7 +161,7 @@ export class _Fields extends _SPCollection<IFieldInfo[]> {
      */
     public addNumber(title: string, properties?: IFieldCreationProperties & AddNumberProps): Promise<IFieldAddResult> {
 
-        return this.add(title, 9, properties);
+        return this.add(title, "SP.FieldNumber", 9, properties);
     }
 
     /**
@@ -171,7 +172,7 @@ export class _Fields extends _SPCollection<IFieldInfo[]> {
      */
     public addCurrency(title: string, properties?: IFieldCreationProperties & AddCurrencyProps): Promise<IFieldAddResult> {
 
-        return this.add(title, 10, {
+        return this.add(title, "SP.FieldCurrency", 10, {
             CurrencyLocaleId: 1033,
             ...properties,
         });
@@ -186,7 +187,7 @@ export class _Fields extends _SPCollection<IFieldInfo[]> {
      */
     public addMultilineText(title: string, properties?: IFieldCreationProperties & AddMultilineTextProps): Promise<IFieldAddResult> {
 
-        return this.add(title, 3, {
+        return this.add(title, "SP.FieldMultiLineText", 3, {
             AllowHyperlink: true,
             AppendOnly: false,
             NumberOfLines: 6,
@@ -203,7 +204,7 @@ export class _Fields extends _SPCollection<IFieldInfo[]> {
      */
     public addUrl(title: string, properties?: IFieldCreationProperties & AddUrlProps): Promise<IFieldAddResult> {
 
-        return this.add(title, 11, {
+        return this.add(title, "SP.FieldUrl", 11, {
             DisplayFormat: UrlFieldFormatType.Hyperlink,
             ...properties,
         });
@@ -216,7 +217,7 @@ export class _Fields extends _SPCollection<IFieldInfo[]> {
      */
     public addUser(title: string, properties?: IFieldCreationProperties & AddUserProps): Promise<IFieldAddResult> {
 
-        return this.add(title, 20, {
+        return this.add(title, "SP.FieldUser", 20, {
             SelectionMode: FieldUserSelectionMode.PeopleAndGroups,
             ...properties,
         });
@@ -241,7 +242,7 @@ export class _Fields extends _SPCollection<IFieldInfo[]> {
      */
     public addChoice(title: string, properties?: IFieldCreationProperties & AddChoiceProps): Promise<IFieldAddResult> {
 
-        return this.add(title, 6, {
+        return this.add(title, "SP.FieldChoice", 6, {
             EditFormat: ChoiceFieldFormatType.Dropdown,
             FillInChoice: false,
             ...properties,
@@ -256,7 +257,7 @@ export class _Fields extends _SPCollection<IFieldInfo[]> {
      */
     public addMultiChoice(title: string, properties?: IFieldCreationProperties & AddChoiceProps): Promise<IFieldAddResult> {
 
-        return this.add(title, 15, {
+        return this.add(title, "SP.FieldMultiChoice", 15, {
             FillInChoice: false,
             ...properties,
         });
@@ -270,7 +271,7 @@ export class _Fields extends _SPCollection<IFieldInfo[]> {
    */
     public addBoolean(title: string, properties?: IFieldCreationProperties): Promise<IFieldAddResult> {
 
-        return this.add(title, 8, properties);
+        return this.add(title, "SP.Field", 8, properties);
     }
 
     /**
@@ -300,7 +301,7 @@ export class _Fields extends _SPCollection<IFieldInfo[]> {
    */
     public addLocation(title: string, properties?: IFieldCreationProperties): Promise<IFieldAddResult> {
 
-        return this.add(title, 33, properties);
+        return this.add(title, "SP.FieldLocation", 33, properties);
     }
 
     /**
@@ -311,7 +312,7 @@ export class _Fields extends _SPCollection<IFieldInfo[]> {
      */
     public addImageField(title: string, properties?: IFieldCreationProperties): Promise<IFieldAddResult> {
 
-        return this.add(title, 34, properties);
+        return this.add(title, "SP.FieldMultiLineText", 34, properties);
     }
 }
 export interface IFields extends _Fields { }
