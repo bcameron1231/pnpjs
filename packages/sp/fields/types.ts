@@ -66,24 +66,19 @@ export class _Fields extends _SPCollection<IFieldInfo[]> {
      * @param properties Differ by type of field being created (see: https://msdn.microsoft.com/en-us/library/office/dn600182.aspx)
      */
     public async add(title: string, fieldType: string, fieldTypeKind: number, properties?: IFieldCreationProperties): Promise<IFieldAddResult> {
-        const createData = await spPost<{Id: string }>(Fields(this,null), body(Object.assign(metadata(fieldType),{
+
+        const data = await spPost<{Id: string }>(Fields(this,null), body(Object.assign(metadata(fieldType),{
             Title: title,
             FieldTypeKind: fieldTypeKind,
-            Required: properties?.Required || false,
             ...properties,
         }), headers({
             "Accept":"application/json;odata=verbose",
             "Content-Type":"application/json;odata=verbose",
         })));
 
-        //Questions - We need verbose headers to pass over metadata. We need matadata to do it in one request to support batching. What's the best way to handle this?
-        const field = this.getById(createData.Id);
-
-        const data = await field();
-
         return {
             data,
-            field,
+            field:this.getById(data.Id),
         };
     }
 
@@ -242,11 +237,14 @@ export class _Fields extends _SPCollection<IFieldInfo[]> {
      */
     public addChoice(title: string, properties?: IFieldCreationProperties & AddChoiceProps): Promise<IFieldAddResult> {
 
-        return this.add(title, "SP.FieldChoice", 6, {
+        const props = {
+            Choices: {
+                results: properties.Choices,
+            },
             EditFormat: ChoiceFieldFormatType.Dropdown,
             FillInChoice: false,
-            ...properties,
-        });
+        };
+        return this.add(title, "SP.FieldChoice", 6,Object.assign({},properties,props));
     }
 
     /**
@@ -257,10 +255,14 @@ export class _Fields extends _SPCollection<IFieldInfo[]> {
      */
     public addMultiChoice(title: string, properties?: IFieldCreationProperties & AddChoiceProps): Promise<IFieldAddResult> {
 
-        return this.add(title, "SP.FieldMultiChoice", 15, {
+        const props = {
+            Choices: {
+                results: properties.Choices,
+            },
             FillInChoice: false,
-            ...properties,
-        });
+        };
+
+        return this.add(title, "SP.FieldMultiChoice", 15,Object.assign({},properties,props));
     }
 
     /**
