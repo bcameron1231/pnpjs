@@ -6,6 +6,12 @@ export {
     IAdmin,
     SharePointSettings,
     ISharePointSettings,
+    ServiceAnnouncements,
+    IServiceAccouncements,
+    HealthOverviews,
+    IHealthOverviews,
+    ServiceHealth,
+    IServiceHealth
 } from "./types.js";
 
 declare module "../fi" {
