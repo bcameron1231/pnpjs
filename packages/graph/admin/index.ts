@@ -38,6 +38,6 @@ Reflect.defineProperty(GraphFI.prototype, "admin", {
     configurable: true,
     enumerable: true,
     get: function (this: GraphFI) {
-        return this.create(<any>Admin);
+        return this.create(<any>Admin, "admin");
     },
 });
