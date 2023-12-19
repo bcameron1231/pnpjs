@@ -1,8 +1,9 @@
 import { MSAL } from "@pnp/msaljsclient/index.js";
-import { spfi, SPBrowser } from "@pnp/sp";
+import { spfi, SPBrowser, And, TextField, Or, NumberField } from "@pnp/sp";
 import "@pnp/sp/webs";
 import { settings } from "../../settings.js";
 // import { graph } from "@pnp/graph/presets/all";
+import "@pnp/sp/presets/all";
 
 // ******
 // Please edit this file and do any testing required. Please do not submit changes as part of a PR.
@@ -33,6 +34,27 @@ document.onreadystatechange = async () => {
                 SPBrowser({ baseUrl: settings.testing.sp.url}), 
                 MSAL(settings.testing.sp.msal.init, {scopes: settings.testing.sp.msal.scopes})
             );
+
+             // Example usage:
+             interface ISPFxListType {
+                Title: string;
+                SPFxAmount: number;
+                CostCenter: string;
+              }
+            
+              await sp.web.lists.getByTitle("SPFx List").items.filter<ISPFxListType>(Or([
+                TextField("Title").Equals("Test"),
+                TextField("Title").Equals("Cameron")
+              ]))();
+             await sp.web.lists.getByTitle("SPFx List").items.filter<ISPFxListType>(And([
+                TextField("Title").Equals("Cameron"),
+                NumberField("SPFxAmount").GreaterThan(0),
+              ]))();
+
+             await sp.web.lists.getByTitle("SPFx List").items.filter<ISPFxListType>(Or([And([
+                TextField("Title").Equals("Test"),
+                NumberField("SPFxAmount").GreaterThan(0),
+              ]), TextField("Title").Equals("Test")]))();
 
             const r = await sp.web();
 

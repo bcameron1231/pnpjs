@@ -1,6 +1,7 @@
 import { combine, isUrlAbsolute, isArray, objectDefinedNotNull, stringIsNullOrEmpty } from "@pnp/core";
 import { IInvokable, Queryable, queryableFactory } from "@pnp/queryable";
 import { spPostDelete, spPostDeleteETag } from "./operations.js";
+import { IField } from "./fields/types.js";
 
 export type SPInit = string | ISPQueryable | [ISPQueryable, string];
 
@@ -149,6 +150,83 @@ export class _SPQueryable<GetType = any> extends Queryable<GetType> {
 export interface ISPQueryable<GetType = any> extends _SPQueryable<GetType> { }
 export const SPQueryable = spInvokableFactory<ISPQueryable>(_SPQueryable);
 
+export interface IFieldCondition<T> {
+  field: keyof T;
+  value?: any;
+  operator?: string;
+}
+
+export interface ICondition<T> {
+  type: 'and' | 'or';
+  conditions: Array<IFieldCondition<T> | ICondition<T>>;
+  toString(): string;
+}
+
+export interface IFieldBuilder<T> {
+  field: keyof T;
+}
+
+export interface ITextFieldBuilder<T> extends IFieldBuilder<T> {
+  Equals(value: string): IFieldCondition<T>;
+}
+
+export interface INumberFieldBuilder<T> extends IFieldBuilder<T> {
+  Equals(value: number): IFieldCondition<T>;
+  GreaterThan(value: number): IFieldCondition<T>;
+}
+
+export function TextField<T>(field: keyof T): ITextFieldBuilder<T> {
+  return {
+    field,
+    Equals(value: string): IFieldCondition<T> {
+      return { field, value, operator: 'eq' };
+    },
+  };
+}
+
+export function NumberField<T>(field: keyof T): INumberFieldBuilder<T> {
+  return {
+    field,
+    Equals(value: number): IFieldCondition<T> {
+      return { field, value, operator: 'eq' };
+    },
+    GreaterThan(value: number): IFieldCondition<T> {
+      return { field, value, operator: 'gt' };
+    },
+  };
+}
+
+export function Or<T>(conditions: Array<IFieldBuilder<T> | ICondition<T>>): ICondition<T> {
+  return {
+    type: 'or',
+    conditions,
+    toString(): string {
+      return this.conditions
+        .map((condition) =>
+        !condition.field
+            ? `(${condition.toString()})`
+            : `${condition.field as string} ${condition.operator} '${condition.value}'`
+        )
+        .join(' or ');
+    },
+  };
+}
+
+export function And<T>(conditions: Array<IFieldBuilder<T> | ICondition<T>>): ICondition<T> {
+  return {
+    type: 'and',
+    conditions,
+    toString(): string {
+      return this.conditions
+        .map((condition) =>
+          !condition.field
+            ? `(${condition.toString()})`
+            : `${condition.field as string} ${condition.operator} '${condition.value}'`
+        )
+        .join(' and ');
+    },
+  };
+}
 /**
  * Represents a REST collection which can be filtered, paged, and selected
  *
@@ -160,8 +238,8 @@ export class _SPCollection<GetType = any[]> extends _SPQueryable<GetType> {
      *
      * @param filter The string representing the filter query
      */
-    public filter(filter: string): this {
-        this.query.set("$filter", filter);
+    public filter<T>(filter:string | ICondition<T>): this {
+        this.query.set("$filter", filter.toString());
         return this;
     }
 
