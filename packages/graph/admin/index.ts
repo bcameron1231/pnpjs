@@ -11,7 +11,7 @@ declare module "../fi" {
     }
 }
 
-defaultPath("admin")
+defaultPath("admin");
 class _Admin extends _GraphQueryable<IAdmin> {
     public get people(){
         return PeopleAdmin(this);
