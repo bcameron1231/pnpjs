@@ -120,6 +120,48 @@ describe("Admin", function () {
         }));
     });
 
+    describe("Service Health", function () {
+        it("Get Health Overviews", pnpTest("79f7392b-053d-44a0-87f6-a1c2332d6841", async function  () {
+            const healthOverviews = await this.pnp.graph.admin.serviceAnnouncements.healthOverviews();
+            return expect(healthOverviews).to.be.an("array");
+        }));
+
+        it("Get Health Issues", pnpTest("6b04e99e-dcbb-48ee-87c2-4d17b1fad12d", async function  () {
+            const issues = await this.pnp.graph.admin.serviceAnnouncements.issues();
+            return expect(issues).to.be.an("array");
+        }));
+
+        it("Get Health Messages", pnpTest("d06cd76b-3a61-4728-ba5e-f97bb6e718a8", async function  () {
+            const messages = await this.pnp.graph.admin.serviceAnnouncements.messages();
+            return expect(messages).to.be.an("array");
+        }));
+
+        it("Get Health Message by ID", pnpTest("2cc3edd5-b7af-4967-b8b4-840d161f1b61", async function  () {
+            const messages = await this.pnp.graph.admin.serviceAnnouncements.messages();
+
+            const messageById = await this.pnp.graph.admin.serviceAnnouncements.messages.getById(messages[0]?.id)
+            return expect(messageById).is.not.null;
+        }));
+
+        it("Get Health Message Attachments", pnpTest("2e26b2a1-5ce8-4cf9-a0dc-4decddba5641", async function  () {
+            const messages = await this.pnp.graph.admin.serviceAnnouncements.messages();
+
+            const attachments = await this.pnp.graph.admin.serviceAnnouncements.messages.getById(messages[0]?.id).attachments();
+            return expect(attachments).to.be.an("array");
+        }));
+
+        it("Get Health Message Attachments by Id", pnpTest("2cef2a70-31c9-4180-91bf-f0bab86e3501", async function  () {
+            const messages = await this.pnp.graph.admin.serviceAnnouncements.messages();
+
+            const attachments = await this.pnp.graph.admin.serviceAnnouncements.messages.getById(messages[0]?.id).attachments();
+            
+            const attachmentById = await this.pnp.graph.admin.serviceAnnouncements.messages.getById(attachments[0]?.id)();
+            
+            return expect(attachmentById).is.ok;
+        }));
+    });
+
+
     after(async function  () {
 
         if (!stringIsNullOrEmpty(propertyId)) {
