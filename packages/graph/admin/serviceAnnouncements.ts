@@ -1,6 +1,12 @@
-import { GraphQueryable, _GraphCollection, _GraphInstance, _GraphQueryable, graphGet, graphInvokableFactory, graphPost } from "../graphqueryable.js";
-import { ServiceAnnouncement as IServiceAnnouncementType, ServiceHealth as IServiceHealthType, ServiceAnnouncementAttachment as IServiceAccountAttachmentType, ServiceHealthIssue as IServiceHealthIssueType, ServiceUpdateMessage as IServiceMessageType } from "@microsoft/microsoft-graph-types";
-import { IGetById, defaultPath, getById, getByName} from "../decorators.js";
+import { GraphQueryable, _GraphCollection, _GraphInstance, graphGet, graphInvokableFactory, graphPost } from "../graphqueryable.js";
+import {
+    ServiceAnnouncement as IServiceAnnouncementType,
+    ServiceHealth as IServiceHealthType,
+    ServiceAnnouncementAttachment as IServiceAccountAttachmentType,
+    ServiceHealthIssue as IServiceHealthIssueType,
+    ServiceUpdateMessage as IServiceMessageType,
+} from "@microsoft/microsoft-graph-types";
+import { IGetById, defaultPath, getById, getByName } from "../decorators.js";
 import { body } from "@pnp/queryable/request-builders.js";
 
 /**
@@ -25,7 +31,7 @@ export const ServiceAnnouncements = graphInvokableFactory<IServiceAccouncements>
 /**
  * Service Health Report
  */
-export class _ServiceHealth extends _GraphInstance<IServiceHealthType> {}
+export class _ServiceHealth extends _GraphInstance<IServiceHealthType> { }
 export interface IServiceHealth extends _ServiceHealth { }
 export const ServiceHealth = graphInvokableFactory<IServiceHealth>(_ServiceHealth);
 
@@ -34,14 +40,14 @@ export const ServiceHealth = graphInvokableFactory<IServiceHealth>(_ServiceHealt
  */
 @defaultPath("healthOverviews")
 @getByName(ServiceHealth)
-export class _HealthOverviews extends _GraphCollection<IServiceHealthType[]> {}
+export class _HealthOverviews extends _GraphCollection<IServiceHealthType[]> { }
 export interface IHealthOverviews extends _HealthOverviews { }
 export const HealthOverviews = graphInvokableFactory<IHealthOverviews>(_HealthOverviews);
 
 /**
  * Health Issue
  */
-export class _HealthIssue extends _GraphInstance<IServiceHealthIssueType> {}
+export class _HealthIssue extends _GraphInstance<IServiceHealthIssueType> { }
 export interface IHealthIssue extends _HealthIssue { }
 export const HealthIssue = graphInvokableFactory<IHealthIssue>(_HealthIssue);
 
@@ -54,7 +60,7 @@ export class _HealthIssues extends _GraphCollection<IServiceHealthIssueType[]> {
     /**
      * Get incident report. The operation returns an error if the specified issue doesn't exist for the tenant or if PIR document does not exist for the issue.
      */
-    public get incidentReport(): any{
+    public get incidentReport(): any {
         return graphGet(GraphQueryable(this, "issueReport"));
     }
 }
@@ -69,7 +75,7 @@ export class _ServiceMessage extends _GraphInstance<IServiceMessageType> {
     /**
     * Get message attachment
     */
-    public get attachments(): any{
+    public get attachments(): any {
         return ServiceMessageAttachments(this);
     }
 }
@@ -104,23 +110,23 @@ export class _ServiceMessages extends _GraphCollection<IServiceHealthIssueType[]
         }));
     }
 
-     /**
-     * Favorite a list of service messages as read for signed-in user
-     *
-     * @param messageIds List of message IDs to mark as read.
-     */
-     public favorite(messageIds: string[]): Promise<IServiceMessageUpdate> {
+    /**
+    * Favorite a list of service messages as read for signed-in user
+    *
+    * @param messageIds List of message IDs to mark as read.
+    */
+    public favorite(messageIds: string[]): Promise<IServiceMessageUpdate> {
         return graphPost(ServiceMessages(this, "favorite"), body({
             messageIds: messageIds,
         }));
     }
 
-     /**
-     * Unfavorite a list of service messages as read for signed-in user
-     *
-     * @param messageIds List of message IDs to mark as read.
-     */
-     public unfavorite(messageIds: string[]): Promise<IServiceMessageUpdate> {
+    /**
+    * Unfavorite a list of service messages as read for signed-in user
+    *
+    * @param messageIds List of message IDs to mark as read.
+    */
+    public unfavorite(messageIds: string[]): Promise<IServiceMessageUpdate> {
         return graphPost(ServiceMessages(this, "unfavorite"), body({
             messageIds: messageIds,
         }));
@@ -131,18 +137,18 @@ export class _ServiceMessages extends _GraphCollection<IServiceHealthIssueType[]
      *
      * @param messageIds List of message IDs to mark as read.
      */
-     public markRead(messageIds: string[]): Promise<IServiceMessageUpdate> {
+    public markRead(messageIds: string[]): Promise<IServiceMessageUpdate> {
         return graphPost(ServiceMessages(this, "markRead"), body({
             messageIds: messageIds,
         }));
     }
 
-     /**
-     * Mark a list of service messages as unread for signed-in user
-     *
-     * @param messageIds List of message IDs to mark as read.
-     */
-     public markUnread(messageIds: string[]): Promise<IServiceMessageUpdate> {
+    /**
+    * Mark a list of service messages as unread for signed-in user
+    *
+    * @param messageIds List of message IDs to mark as read.
+    */
+    public markUnread(messageIds: string[]): Promise<IServiceMessageUpdate> {
         return graphPost(ServiceMessages(this, "markUnread"), body({
             messageIds: messageIds,
         }));
@@ -168,6 +174,6 @@ export interface IServiceMessageAttachments extends _ServiceMessageAttachments {
 export const ServiceMessageAttachments = graphInvokableFactory<IServiceMessageAttachments>(_ServiceMessageAttachments);
 
 
-export interface IServiceMessageUpdate{
+export interface IServiceMessageUpdate {
     value: boolean;
 }

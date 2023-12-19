@@ -19,7 +19,6 @@ class _Admin extends _GraphQueryable<IAdmin> {
     public get sharepoint() {
         return SharePointAdmin(this);
     }
-    
     public get serviceAnnouncements() {
         return ServiceAnnouncements(this);
     }

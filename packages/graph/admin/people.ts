@@ -1,4 +1,4 @@
-import { _GraphQueryable, graphInvokableFactory, _GraphInstance, _GraphCollection } from "../graphqueryable.js";
+import { graphInvokableFactory, _GraphInstance, _GraphCollection } from "../graphqueryable.js";
 import { defaultPath, updateable, IUpdateable, addable, getById, IAddable, deleteable, IDeleteable, IGetById } from "../decorators.js";
 import { ProfileCardProperty  as IProfileCardPropertyType, PeopleAdminSettings as IPeopleAdminSettingsType } from "@microsoft/microsoft-graph-types";
 
@@ -12,7 +12,7 @@ export class _PeopleAdmin extends _GraphInstance<IPeopleAdminSettingsType> {
     }
 }
 
-export interface IPeopleAdmin extends _PeopleAdmin {}
+export interface IPeopleAdmin extends _PeopleAdmin { }
 export const PeopleAdmin = graphInvokableFactory<IPeopleAdmin>(_PeopleAdmin);
 
 /**

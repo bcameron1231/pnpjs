@@ -1,4 +1,4 @@
-import { _GraphQueryable, graphInvokableFactory, _GraphInstance } from "../graphqueryable.js";
+import { graphInvokableFactory, _GraphInstance } from "../graphqueryable.js";
 import { defaultPath, updateable, IUpdateable } from "../decorators.js";
 import { SharepointSettings as ISharePointSettingsType } from "@microsoft/microsoft-graph-types";
 
@@ -11,7 +11,7 @@ export class _SharePointAdmin extends _GraphInstance<ISharePointAdmin> {
 
 export interface ISharePointAdmin extends _SharePointAdmin {
     readonly settings: ISharePointSettings;
- }
+}
 export const SharePointAdmin = graphInvokableFactory<ISharePointAdmin>(_SharePointAdmin);
 
 /**
