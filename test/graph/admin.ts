@@ -139,7 +139,7 @@ describe("Admin", function () {
         it("Get Health Message by ID", pnpTest("2cc3edd5-b7af-4967-b8b4-840d161f1b61", async function  () {
             const messages = await this.pnp.graph.admin.serviceAnnouncements.messages();
 
-            const messageById = await this.pnp.graph.admin.serviceAnnouncements.messages.getById(messages[0]?.id)
+            const messageById = await this.pnp.graph.admin.serviceAnnouncements.messages.getById(messages[0]?.id)();
             return expect(messageById).is.not.null;
         }));
 
@@ -152,11 +152,9 @@ describe("Admin", function () {
 
         it("Get Health Message Attachments by Id", pnpTest("2cef2a70-31c9-4180-91bf-f0bab86e3501", async function  () {
             const messages = await this.pnp.graph.admin.serviceAnnouncements.messages();
-
             const attachments = await this.pnp.graph.admin.serviceAnnouncements.messages.getById(messages[0]?.id).attachments();
-            
             const attachmentById = await this.pnp.graph.admin.serviceAnnouncements.messages.getById(attachments[0]?.id)();
-            
+
             return expect(attachmentById).is.ok;
         }));
     });
