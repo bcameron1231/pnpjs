@@ -4,6 +4,7 @@ The article describes the behaviors exported by the `@pnp/graph` library. Please
 
 ## DefaultInit
 
+
 The `DefaultInit` behavior, itself a composed behavior includes Telemetry, RejectOnError, and ResolveOnData. Additionally, it sets the cache and credentials properties of the RequestInit and ensures the request url is absolute.
 
 ```TypeScript
