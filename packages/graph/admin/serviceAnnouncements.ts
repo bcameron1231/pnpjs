@@ -7,7 +7,7 @@ import {
     ServiceUpdateMessage as IServiceMessageType,
 } from "@microsoft/microsoft-graph-types";
 import { IGetById, defaultPath, getById, getByName } from "../decorators.js";
-import { body } from "@pnp/queryable/request-builders.js";
+import { body } from "@pnp/queryable";
 
 /**
  * Tenant Service Announcements
