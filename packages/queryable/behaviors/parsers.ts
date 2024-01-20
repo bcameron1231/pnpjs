@@ -26,19 +26,19 @@ export function TextParse(): TimelinePipe {
 export function BlobParse(): TimelinePipe {
 
     return parseBinderWithErrorCheck( async (response) => {
-        const binaryResponseBody = parseToAtob(await response.text());
+        const content = await response.blob();
+
+        const binaryResponseBody = parseToAtob(await content.text());
         // handle batch responses for things that are base64, like photos https://github.com/pnp/pnpjs/issues/2825
         if(binaryResponseBody){
             // Create an array buffer from the binary string
-            const arrayBuffer = new ArrayBuffer(binaryResponseBody.length);
-            const uint8Array = new Uint8Array(arrayBuffer);
-            for (let i = 0; i < binaryResponseBody.length; i++) {
-                uint8Array[i] = binaryResponseBody.charCodeAt(i);
-            }
+            const uint8Array = new Uint8Array(
+                binaryResponseBody.split("").map(char => char.charCodeAt(0))
+            );
             // Create a Blob from the array buffer
-            return new Blob([arrayBuffer], {type:response.headers.get("Content-Type")});
+            return new Blob([uint8Array], {type:response.headers.get("Content-Type")});
         }
-        return response.blob();
+        return content;
     });
 }
 
