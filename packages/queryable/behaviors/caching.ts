@@ -1,5 +1,5 @@
 import { Queryable } from "../queryable.js";
-import { getHashCode, PnPClientStorage, dateAdd, TimelinePipe, noInherit } from "@pnp/core";
+import { getHashCode, PnPClientStorage, dateAdd, TimelinePipe, noInherit, CopyFrom, AssignFrom } from "@pnp/core";
 
 export type CacheKeyFactory = (url: string) => string;
 export type CacheExpireFunc = (url: string) => Date;
@@ -97,9 +97,9 @@ export function Caching(props?: ICachingProps): TimelinePipe<Queryable> {
                 if (cached === null) {
 
                     // if we don't have a cached result we need to get it after the request is sent. Get the raw value (un-parsed) to store into cache
-                    this.on.rawData(noInherit(async function (response) {
+                    this.using(CopyFrom(instance.on.rawData.replace(async function (response) {
                         setCachedValue(response);
-                    }));
+                    })));
 
                 } else {
                     // if we find it in cache, override send request, and continue flow through timeline and parsers.
