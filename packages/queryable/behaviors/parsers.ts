@@ -86,6 +86,9 @@ export function parseODataJSON(json: any): any {
 
         result = json.value;
     }
+    else if(hOP(json, "data")) {
+        result = json.data;
+    }
 
     return result;
 }
